@@ -1,5 +1,5 @@
-from fastapi import FastAPI, status, Response
-from prometheus_client import generate_latest, CONTENT_TYPE_LATEST, Counter
+from fastapi import FastAPI, Response, status
+from prometheus_client import CONTENT_TYPE_LATEST, Counter, generate_latest
 
 app=FastAPI()
 
