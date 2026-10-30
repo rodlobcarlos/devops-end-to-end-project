@@ -23,7 +23,7 @@ RUN groupadd -g 10001 appgroup && \
 WORKDIR /app
 
 # Copy packages from builder step
-COPY --from=builder /root/.local /home/appuser/.local
+COPY --from=Builder /root/.local /home/appuser/.local
 COPY src/ /app/src/
 
 # Configure enviroment variables and path
