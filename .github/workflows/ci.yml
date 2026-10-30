@@ -2,10 +2,12 @@ name: Continuous Integration and security
 
 on:
   push:
-    banches: [ "main" ]
+    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
-
+    
+  workflow_dispatch:
+  
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
