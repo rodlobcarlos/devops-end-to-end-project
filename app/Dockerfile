@@ -5,7 +5,7 @@ FROM python:3.12-slim as Builder
 WORKDIR /build
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    gcc \
+    gcc=* \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy dependences file and install it
