@@ -12,6 +12,9 @@ env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
 
+permissions:
+  packages: write
+
 jobs:
 # ---------------------------------------
   # Job about linting and unit tests
