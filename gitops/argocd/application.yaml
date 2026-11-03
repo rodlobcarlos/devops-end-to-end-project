@@ -1,0 +1,26 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: devops-api
+  namespace: argocd
+  # Protección para evitar borrados accidentales
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/rodlobcarlos/devops-end-to-end-project.git
+    targetRevision: main
+    path: gitops/helm/devops-api
+    helm:
+      valueFiles:
+        - values.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+  syncPolicy:
+    automated:
+      prune: true     # Borra recursos en el clúster si se eliminan del repo
+      selfHeal: true  # Si alguien cambia algo a mano con kubectl, ArgoCD lo corrige al estado de Git
+    syncOptions:
+      - CreateNamespace=true
