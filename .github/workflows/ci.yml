@@ -62,9 +62,10 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Run Trivy vulnerability scanner on filesystem
-        uses: aquasecurity/trivy-action@0.76.1
+        uses: aquasecurity/trivy-action@v0.29.0
         with: 
           scan-type: "fs"
+          trivy-version: "v0.76.1"
           scan-ref: "."
           severity: "CRITICAL, HIGH"
           format: "table"
@@ -113,9 +114,10 @@ jobs:
           cache-to: type=gha,mode=max
 
       - name: Run Trivy scanner on Container Image
-        uses: aquasecurity/trivy-action@0.76.1
+        uses: aquasecurity/trivy-action@v0.29.0
         with:
           image-ref: devops-showcase-api:test
+          trivy-version: "v0.76.1"
           format: "table"
           exit-code: "1"
           severity: "CRITICAL,HIGH"
