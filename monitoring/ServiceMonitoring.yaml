@@ -1,0 +1,18 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: devops-api-monitor
+  namespace: monitoring
+  labels:
+    release: monitoring  # Etiqueta requerida para que el operador de Prometheus lo detecte
+spec:
+  selector:
+    matchLabels:
+      app: devops-api    # Debe coincidir con el label de tu Service de Kubernetes
+  namespaceSelector:
+    matchNames:
+      - default          # Namespace donde corre devops-api
+  endpoints:
+    - port: http         # Nombre del puerto definido en tu service.yaml
+      path: /metrics     # Ruta de scraping de métricas
+      interval: 15s      # Frecuencia de recolección
