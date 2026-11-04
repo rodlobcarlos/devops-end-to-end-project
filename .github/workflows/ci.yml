@@ -21,7 +21,7 @@ jobs:
 # ---------------------------------------
   lint-and-test:
     name: Lint and unit test
-    runs-on: ubuntu-26
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout code
@@ -57,7 +57,7 @@ jobs:
 # ----------------------------------------------------
   security-scan:
     name: Source and dependency Scan
-    runs-on: ubuntu-26
+    runs-on: ubuntu-24.04
     needs: [lint-and-test]
 
     steps:
@@ -78,7 +78,7 @@ jobs:
 # ---------------------------------------------------------
   build-and-scan-image:
     name: Build, Scan and Publish Image
-    runs-on: ubuntu-26
+    runs-on: ubuntu-24.04
     needs: [security-scan]
 
     steps: 
