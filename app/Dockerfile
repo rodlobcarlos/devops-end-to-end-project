@@ -15,6 +15,9 @@ RUN pip install --no-cache-dir --user -r requirements.txt
 # Etapa 2: Final runtime (mínima y segura)
 FROM python:3.12-slim AS runtime
 
+# Actualizar paquetes de seguridad
+RUN apt-get update && apt-get upgrade -y && rm -rf /var/lib/apt/lists/*
+
 # Create user and group witout privilege
 RUN groupadd -g 10001 appgroup && \
     useradd -u 10001 -g appgroup -s /bin/bash -m appuser
