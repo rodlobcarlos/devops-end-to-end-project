@@ -1,0 +1,35 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: devops-api-alerts
+  namespace: monitoring
+  labels:
+    release: monitoring
+    role: alert-rules
+spec:
+  groups:
+    - name: devops-api.rules
+      rules:
+        # Alerta 1: Tasa de errores HTTP 5xx superior al 5% durante 1 minuto
+        - alert: HighHttpErrorRate
+          expr: |
+            sum(rate(http_requests_total{status=~"5.*"}[1m])) 
+            / 
+            sum(rate(http_requests_total[1m])) > 0.05
+          for: 1m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Alta tasa de errores 5xx en devops-api"
+            description: "Más del 5% de las solicitudes están fallando con error de servidor (HTTP 5xx)."
+
+        # Alerta 2: Pod superando los 100 MiB de RAM durante 2 minutos
+        - alert: ApiHighMemoryUsage
+          expr: |
+            sum(container_memory_working_set_bytes{namespace="default", pod=~"devops-api-.*", container="devops-api"}) by (pod) > 104857600
+          for: 2m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Consumo elevado de memoria en {{ $labels.pod }}"
+            description: "El pod {{ $labels.pod }} ha superado los 100 MiB de consumo de memoria durante más de 2 minutos."
