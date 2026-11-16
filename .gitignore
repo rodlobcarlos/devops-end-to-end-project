@@ -39,3 +39,6 @@ coverage/
 *.tfstate
 *.tfstate.*
 *.tfplan
+
+# Informe
+cluster_report.html
