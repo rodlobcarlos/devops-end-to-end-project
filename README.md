@@ -56,6 +56,16 @@ Proyecto monorepo integral que reproduce a coste cero un ciclo de vida de desarr
 
 - **Alerting Proactivo**: Configuración de un recurso PrometheusRule (devops-api-alerts) que evalúa una ventana temporal (for: 1m) ante ráfagas sostenidas de errores 5xx (>5%) para evitar la fatiga por alertas (alert fatigue).
 
+## ⚙️ Automatización y Herramientas SRE
+
+Para optimizar las operaciones y diagnosticar la plataforma, se han desarrollado herramientas internas automatizadas e integradas a través de un Makefile (comandos make test, make cluster, make clean):
+
+- **scripts/bootstrap.sh**: Orquestación completa en Bash para inicializar y desplegar el entorno completo de forma automatizada (Terraform, ArgoCD y el stack de observabilidad).
+
+- **scripts/k8s_doctor.py**: Interfaz de línea de comandos (CLI) en Python que audita la salud de los pods del clúster, consulta la API de Prometheus para reportar alertas activas, y genera un informe visual detallado en HTML.
+
+- **scripts/update_gitops_tag.py**: Automatización en Python integrada directamente en GitHub Actions que actualiza el SHA de la imagen en values.yaml tras cada compilación exitosa, cerrando el ciclo GitOps.
+
 ## Cuadro de Mandos en Grafana
 Visualización en tiempo real de peticiones entrantes, ráfagas de error forzadas y consumo de memoria RAM por réplica:
 
