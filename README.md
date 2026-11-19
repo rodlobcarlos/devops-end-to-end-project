@@ -7,7 +7,8 @@
 ![GitOps](https://img.shields.io/badge/GitOps-ArgoCD-orange?logo=argo&logoColor=white)
 ![Observability](https://img.shields.io/badge/Observability-Prometheus%20%26%20Grafana-F46800?logo=prometheus&logoColor=white)
 ![Python](https://img.shields.io/badge/API-Python%20%26%20FastAPI-3776AB?style=flat&logo=python&logoColor=white)
-
+![Bash](https://img.shields.io/badge/Script-Bash-green?style=flat&logo=bash&logoColor=white)
+![Python](https://img.shields.io/badge/Script-Python-3776AB?style=flat&logo=python&logoColor=white)
 
 Proyecto monorepo integral que reproduce a coste cero un ciclo de vida de desarrollo de software (SDLC) completo con enfoque Cloud-Native, DevSecOps y observabilidad SRE.
 
@@ -17,26 +18,24 @@ Proyecto monorepo integral que reproduce a coste cero un ciclo de vida de desarr
 [Desarrollador / Git Push]
          │
          ▼ (Pull Request / Push)
-[GitHub Actions]
-   │
-   ├── 1. CI / DevSecOps
-   │      ├── Linters: Ruff & Hadolint
-   │      ├── Tests: Pytest
-   │      ├── Vulnerability Scan: Trivy (exit-code 1 en HIGH/CRITICAL)
-   │      └── Container Build & Push: GHCR
-   │
-   ├── 2. IaC (Aprovisionamiento)
-   │      └── Terraform ──► Clúster Kind (3 Nodos: 1 control-plane, 2 workers)
-   │
-   ├── 3. GitOps (Despliegue Continuo)
-   │      └── ArgoCD ──► Auto-Sync & Reconcile ──► Clúster Kubernetes
-   │
-   └── 4. Workload & SRE
-          └── Pods FastAPI (Multi-stage Distroless, Non-root)
-                 ├── HPA: Autoescalado por CPU y Memoria
-                 └── Scrape /metrics ──► Prometheus Operator
-                                               ├── Grafana (Dashboard RED)
-                                               └── PrometheusRules (Alertas 5xx & RAM)
+[GitHub Actions (CI / DevSecOps)]
+   ├── 1. Linters: Ruff & Hadolint
+   ├── 2. Tests: Pytest
+   ├── 3. Vulnerability Scan: Trivy (exit-code 1 en HIGH/CRITICAL)
+   ├── 4. Container Build & Push: GHCR (tag: commit SHA)
+   └── 5. GitOps Update (Python): scripts/update_gitops_tag.py ──┐
+                                                                 │ (Actualiza values.yaml)
+                                                                 ▼
+[Automatización & Tooling (scripts/)]                    [Repositorio Git (Helm)]
+   ├── bootstrap.sh (Bash): Orquesta ciclo de vida ──┐           │
+   │     ├── Terraform ──► Clúster Kind (3 Nodos)    │           ▼
+   │     ├── ArgoCD ─────► Auto-Sync & Reconcile ◄───┼───────────┘
+   │     └── Monitoring ─► Prometheus & Grafana      │
+   │                                                 ▼
+   ├── k8s_doctor.py (Python): Auditoría SRE ──► [Clúster Kubernetes]
+   │     └── Genera reporte HTML + consulta alertas   └── Pods FastAPI (Distroless, Non-root)
+   │                                                        ├── HPA (CPU & Memoria)
+   └── chaos-test.sh (Bash): Inyecta tráfico HTTP 500 ──────┴── /metrics ──► Prometheus & Grafana
 ```
 
 ## 🛠 Decisiones de Ingeniería y Arquitectura
@@ -82,12 +81,10 @@ Prerrequisitos
 - Helm 3 & Kubectl
 - Kind
 
-### Inicializar Infraestructura con Terraform
-```
-cd terraform
-terraform init
-terraform apply -auto-approve
-cd ..
+### Despliegue automatizado del entorno completo
+```bash
+chmod +x scripts/bootstrap.sh
+./scripts/bootstrap.sh up
 ```
 ### Desplegar ArgoCD
 ```
@@ -114,24 +111,27 @@ kubectl apply -f monitoring/alerts/api-rules.yaml
 Recomiendo ejecutar cada comando en una terminal distinta
 | Servicio | Comando Port-Forward | URL Local | Credenciales por Defecto |
 | :--- | :--- | :--- | :--- |
-| **API Backend** | `kubectl port-forward svc/devops-api -n default 5000:80` | `http://localhost:5000/docs` | N/A (Métricas en `/metrics`) |
+| **API Backend** | `kubectl port-forward svc/devops-api -n default 8000:80` | `http://localhost:8000/docs` | N/A (Métricas en `/metrics`) |
 | **ArgoCD** | `kubectl port-forward svc/argocd-server -n argocd 8080:443` | `https://localhost:8080` | `admin` / *(Secret descifrado)* |
 | **Grafana** | `kubectl port-forward svc/monitoring-grafana -n monitoring 3000:80` | `http://localhost:3000` | `admin` / `prom-operator` |
 | **Prometheus** | `kubectl port-forward svc/monitoring-kube-prometheus-prometheus -n monitoring 9090:9090` | `http://localhost:9090` | N/A |
 
 ## 🧪 Pruebas de Resiliencia y Simulación de Caos
 Para comprobar las alertas en Prometheus Operator y la respuesta de los paneles de Grafana:
-```
+```bash
 # Iniciar inyección de tráfico concurrente con fallos inducidos (HTTP 500)
 chmod +x scripts/chaos-test.sh
 ./scripts/chaos-test.sh
 ```
+Auditoría de salud del clúster
+```bash
+python3 scripts/k8s_doctor.py
+# Muestra el diagnóstico en consola y genera cluster_report.html
+```
 
 ## 🧹 Limpieza y Destrucción del Entorno
 Para eliminar todos los recursos creados y liberar memoria y almacenamiento en el equipo anfitrión:
-```
-cd terraform
-terraform destroy -auto-approve
-cd ..
+```bash
+./scripts/bootstrap.sh down
 docker system prune -f
 ```

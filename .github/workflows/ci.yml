@@ -54,7 +54,7 @@ jobs:
           pytest -v
 
 # ----------------------------------------------------
-  # Job about secority on code and dependencies (SCA)
+  # Job about security on code and dependencies (SCA)
 # ----------------------------------------------------
   security-scan:
     name: Source and dependency Scan
