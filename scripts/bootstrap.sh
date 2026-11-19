@@ -27,7 +27,7 @@ if [[ "$ACTION" == "up" ]]; then
     --namespace monitoring --create-namespace --set grafana.adminPassword="admin" --wait
 
   kubectl apply -f monitoring/alerts/api-rules.yaml
-  kubectl apply -f helm/templates/servicemonitor.yaml
+  kubectl apply -f monitoring/servicemonitor.yaml
 
   PASS=$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d)
   echo "✅ Todo listo! Usuario ArgoCD: admin | Password: $PASS"
