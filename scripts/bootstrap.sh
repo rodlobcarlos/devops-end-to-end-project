@@ -12,7 +12,7 @@ if [[ "$ACTION" == "up" ]]; then
   done
 
   echo "2. Creando clúster con Terraform..."
-  cd "$TF_DIR" && terraform init && terraform apply -auto-approve && cd ..
+  cd "$TF_DIR" && terraform init && terraform apply -auto-approve && cd - >/dev/null
   kubectl wait --for=condition=Ready nodes --all --timeout=180s
 
   echo "3. Instalando ArgoCD..."
@@ -34,7 +34,7 @@ if [[ "$ACTION" == "up" ]]; then
 
 elif [[ "$ACTION" == "down" ]]; then
   echo "Destruyendo entorno..."
-  cd "$TF_DIR" && terraform destroy -auto-approve && cd ..
+  cd "$TF_DIR" && terraform destroy -auto-approve && cd - >/dev/null
   echo "✅ Entorno eliminado."
 
 else
