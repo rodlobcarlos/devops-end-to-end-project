@@ -2,6 +2,7 @@
 set -euo pipefail
 
 ACTION="${1:-up}"
+TF_DIR="terraform/enviroments/local"
 
 if [[ "$ACTION" == "up" ]]; then
   echo "1. Comprobando herramientas..."
@@ -10,7 +11,7 @@ if [[ "$ACTION" == "up" ]]; then
   done
 
   echo "2. Creando clúster con Terraform..."
-  cd terraform && terraform init && terraform apply -auto-approve && cd ..
+  cd "$TF_DIR" && terraform init && terraform apply -auto-approve && cd ..
   kubectl wait --for=condition=Ready nodes --all --timeout=180s
 
   echo "3. Instalando ArgoCD..."
@@ -32,7 +33,7 @@ if [[ "$ACTION" == "up" ]]; then
 
 elif [[ "$ACTION" == "down" ]]; then
   echo "Destruyendo entorno..."
-  cd terraform && terraform destroy -auto-approve && cd ..
+  cd "$TF_DIR" && terraform destroy -auto-approve && cd ..
   echo "✅ Entorno eliminado."
 
 else
