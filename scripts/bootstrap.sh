@@ -16,7 +16,7 @@ if [[ "$ACTION" == "up" ]]; then
 
   echo "3. Instalando ArgoCD..."
   kubectl create namespace argocd --dry-run=client -o yaml | kubectl apply -f -
-  kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+  kubectl apply --server-side --force-conflicts -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
   kubectl wait --for=condition=available deployment/argocd-server -n argocd --timeout=300s
   kubectl apply -f gitops/argocd/application.yaml
 
