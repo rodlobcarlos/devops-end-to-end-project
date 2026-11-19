@@ -59,7 +59,7 @@ Proyecto monorepo integral que reproduce a coste cero un ciclo de vida de desarr
 
 Para optimizar las operaciones y diagnosticar la plataforma, se han desarrollado herramientas internas automatizadas e integradas a través de un Makefile (comandos make test, make cluster, make clean):
 
-- **scripts/bootstrap.sh**: Orquestación completa en Bash para inicializar y desplegar el entorno completo de forma automatizada (Terraform, ArgoCD y el stack de observabilidad).
+- **scripts/bootstrap.sh:** Orquestador defensivo (`set -euo pipefail`) que valida prerrequisitos locales, aprovisiona el clúster Kind con Terraform, despliega `metrics-server` (configurado con `--kubelet-insecure-tls` para habilitar la API de métricas del HPA en Kind), instala ArgoCD y despliega el stack de observabilidad de un solo golpe (`./scripts/bootstrap.sh up`).
 
 - **scripts/k8s_doctor.py**: Interfaz de línea de comandos (CLI) en Python que audita la salud de los pods del clúster, consulta la API de Prometheus para reportar alertas activas, y genera un informe visual detallado en HTML.
 
@@ -85,26 +85,6 @@ Prerrequisitos
 ```bash
 chmod +x scripts/bootstrap.sh
 ./scripts/bootstrap.sh up
-```
-### Desplegar ArgoCD
-```
-kubectl create namespace argocd
-kubectl apply -n argocd -f [https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml](https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml)
-kubectl wait --for=condition=available deployment/argocd-server -n argocd --timeout=300s
-
-# Obtener credencial inicial del usuario admin
-kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d && echo
-```
-
-### Instalar Stack de Observabilidad
-```
-helm repo add prometheus-community [https://prometheus-community.github.io/helm-charts](https://prometheus-community.github.io/helm-charts)
-helm repo update
-helm install monitoring prometheus-community/kube-prometheus-stack -n monitoring --create-namespace
-
-# Aplicar monitores de servicio y reglas de alerta
-kubectl apply -f helm/templates/servicemonitor.yaml
-kubectl apply -f monitoring/alerts/api-rules.yaml
 ```
 
 ### 🌐 Mapeo de Puertos y Puntos de Acceso
