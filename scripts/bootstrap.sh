@@ -15,6 +15,14 @@ if [[ "$ACTION" == "up" ]]; then
   cd "$TF_DIR" && terraform init && terraform apply -auto-approve && cd - >/dev/null
   kubectl wait --for=condition=Ready nodes --all --timeout=180s
 
+  echo "2.5. Instalando metrics-server para el HPA..."
+  kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+  if ! kubectl -n kube-system get deployment metrics-server -o jsonpath='{.spec.template.spec.containers[0].args}' | grep -q "kubelet-insecure-tls"; then
+    kubectl patch -n kube-system deployment metrics-server --type='json' \
+      -p='[{"op": "add", "path": "/spec/template/spec/containers/0/args/-", "value": "--kubelet-insecure-tls"}]'
+  fi
+  kubectl wait --for=condition=available deployment/metrics-server -n kube-system --timeout=90s
+  
   echo "3. Instalando ArgoCD..."
   kubectl create namespace argocd --dry-run=client -o yaml | kubectl apply -f -
   kubectl apply --server-side --force-conflicts -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
