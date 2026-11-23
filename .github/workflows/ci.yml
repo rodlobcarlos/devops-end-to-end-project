@@ -146,3 +146,26 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add gitops/helm/devops-api/values.yaml
           git diff --staged --quiet || git commit -m "chore(gitops): update image tag to ${SHORT_SHA} [skip ci]"
+
+# ---------------------------------------------------------
+  # Job: Despliegue automático en Azure Container Apps
+# ---------------------------------------------------------
+  azure-deploy:
+    name: Deploy to Azure Container Apps
+    runs-on: ubuntu-24.04
+    needs: build-and-scan-image
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Azure login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Deploy new revision to Azure Container Apps
+        uses: azure/container-apps-deploy-actions@v2
+        with:
+          resourceGroup: rg-portfolio-dev-weu
+          containerAppName: portfolio-web
+          imageToDeploy: ghcr.io/${{ github.repository }}:latest
+    
