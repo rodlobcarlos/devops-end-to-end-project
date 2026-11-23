@@ -1,6 +1,6 @@
 # Cloud-Native DevOps & SRE Showcase Platform
 
-[![Continuous Integration and security](https://github.com/rodlobcarlos/devops-end-to-end-project/actions/workflows/ci.yml/badge.svg)](https://github.com/rodlobcarlos/devops-end-to-end-project/actions/workflows/ci.yml)
+[![ci/cd and security](https://github.com/rodlobcarlos/devops-end-to-end-project/actions/workflows/ci_cd.yml/badge.svg)](https://github.com/rodlobcarlos/devops-end-to-end-project/actions/workflows/ci_cd.yml)
 ![Security: Trivy](https://img.shields.io/badge/Security-Trivy%20Scanned-blue)
 ![Kubernetes](https://img.shields.io/badge/Kubernetes-Kind-326ce5?logo=kubernetes&logoColor=white)
 ![IaC](https://img.shields.io/badge/IaC-Terraform-7B42BC?logo=terraform&logoColor=white)
