@@ -170,4 +170,7 @@ jobs:
           resourceGroup: rg-portfolio-dev-weu
           containerAppName: portfolio-web
           imageToDeploy: ghcr.io/${{ github.repository }}:${{ needs.build-and-scan-image.outputs.image_tag }}
+          registryUrl: ghcr.io
+          registryUsername: ${{ github.actor }}
+          registryPassword: ${{ secrets.GHCR_PULL_TOKEN }}
     
