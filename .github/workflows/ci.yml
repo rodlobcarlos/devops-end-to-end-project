@@ -81,6 +81,8 @@ jobs:
     name: Build, Scan and Publish Image
     runs-on: ubuntu-24.04
     needs: [security-scan]
+    outputs:
+      image_tag: ${{ steps.meta.outputs.version }}
 
     steps: 
       - name: Checkout code
@@ -167,5 +169,5 @@ jobs:
         with:
           resourceGroup: rg-portfolio-dev-weu
           containerAppName: portfolio-web
-          imageToDeploy: ghcr.io/${{ github.repository }}:${GITHUB_SHA::7}
+          imageToDeploy: ghcr.io/${{ github.repository }}:${{ needs.build-and-scan-image.outputs.image_tag }}
     
