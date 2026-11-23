@@ -81,8 +81,6 @@ jobs:
     name: Build, Scan and Publish Image
     runs-on: ubuntu-24.04
     needs: [security-scan]
-    outputs:
-      image_tag: ${{ steps.meta.outputs.version }}
 
     steps: 
       - name: Checkout code
